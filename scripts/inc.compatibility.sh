@@ -295,44 +295,6 @@ EOFILE
   fi
 }
 
-minapihack(){
-  useminapi=""
-  case "$package" in
-    com.google.android.dialer)
-      if [ "$API" -ge "24" ]; then
-        useminapi="24"
-      fi;;
-    com.google.android.gms)
-      if [ "$API" -ge "27" ]; then
-        useminapi="27"
-      elif [ "$API" -ge "23" ]; then
-        useminapi="23"
-      elif [ "$API" -ge "21" ]; then
-        useminapi="21"
-      fi;;
-    com.android.chrome)
-      if [ "$ARCH" = "arm64" ] && [ "$API" -ge "29" ]; then # for now only available on arm64
-        useminapi="29"
-      elif [ "$API" -ge "24" ]; then
-        useminapi="24"
-      elif [ "$API" -ge "21" ]; then
-        useminapi="21"
-      fi;;
-    com.google.android.webview)
-      if [ "$ARCH" = "arm64" ] && [ "$API" -ge "29" ]; then # for now only available on arm64
-        useminapi="29"
-      elif [ "$API" -ge "21" ]; then
-        useminapi="21"
-      fi;;
-    com.google.android.googlequicksearchbox)
-      if [ "$ARCH" = "arm64" ] && [ "$API" -ge "29" ]; then # for now only available on arm64
-        useminapi="29"
-      elif [ "$API" -ge "21" ]; then
-        useminapi="21"
-      fi;;
-  esac
-}
-
 systemlibhack(){
   case "$package" in
     com.google.android.webview) if [ "$API" -lt "23" ]; then #webview libs are only on /system/lib/ on pre-Marshmallow

@@ -168,9 +168,7 @@ buildapp() {
   if [ -z "$5" ]; then usearch="$ARCH"
   else usearch="$5"; fi #allows for an override
 
-  minapihack #Some packages need a minimal api level to maintain compatibility with the OS
-
-  if getapksforapi "$package" "$usearch" "$usemaxapi" "$useminapi"; then
+  if getapksforapi "$package" "$usearch" "$usemaxapi"; then
     baseversionname=""
     for dpivariant in $(echo "$sourceapks" | tr ' ' ''); do #we replace the spaces with a special char to survive the for-loop
       dpivariant="$(echo "$dpivariant" | tr '' ' ')" #and we place the spaces back again
@@ -219,9 +217,7 @@ buildapp() {
 
 getapksforapi() {
   #this functions finds the highest available acceptable apk for a given api and architecture
-  #$1 package, $2 arch, $3 api, $4 minapi
-  if [ -z "$4" ]; then minapi="0"
-  else minapi="$4"; fi #specify minimal api
+  #$1 package, $2 arch, $3 api
 
   if ! stat --printf='' "$SOURCES/$2/"*"app/$1" 2>/dev/null; then
     return 1 #appname is not there, error!?
@@ -233,15 +229,15 @@ getapksforapi() {
 "  #We set IFS to newline here so that spaces can survive the for loop
   #sed copies filename to the beginning, to compare version, and later we remove it with cut
   maxsdkerrorapi=""
-  for foundapk in $(find $SOURCES/$2/*app/$1 -iname '*.apk' 2>/dev/null| sed 's!.*/\(.*\)!\1/&!' | sort -r -n -t/ -k1,1 | cut -d/ -f2-); do
+  for foundapk in $(find $SOURCES/$2/*app/$1 -iname '*.apk' 2>/dev/null| sed 's!.*/\(.*\)!/&!' | sort -r -n -t/ -k1,1 | cut -d/ -f2-); do
     foundpath="$(dirname "$(dirname "$foundapk")")"
     api="$(basename "$foundpath")"
     if [ "$maxsdkerrorapi" = "$api" ]; then
       continue #if we already know that this api hit the maxsdk error, do not try it again
     fi
-    if [ "$api" -le "$3" ] && [ "$api" -ge "$minapi" ]; then
+    if [ "$api" -le "$3" ]; then
       #We need to keep them sorted
-      sourceapks="$(find "$foundpath" -iname '*.apk' | sed 's!.*/\(.*\)!\1/&!' | sort -r -n -t/ -k1,1 | cut -d/ -f2-)"
+      sourceapks="$(find "$foundpath" -iname '*.apk' | sed 's!.*/\(.*\)!/&!' | sort -r -n -t/ -k1,1 | cut -d/ -f2-)"
       for maxsdkapk in $sourceapks; do
         maxsdk="$(aapt dump badging "$maxsdkapk" 2>/dev/null | grep -a "maxSdkVersion:" | sed 's/maxSdkVersion://' | sed "s/'//g")"
         if [ -n "$maxsdk" ] && [ "$maxsdk" -lt "$3" ]; then
