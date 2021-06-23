@@ -29,3 +29,9 @@ local.properties
 *.apk
 #APKs that are marked as potentially dangerous
 *.err
+
+mk_*
+x_*
+xfiles/*
+cherrypick.sh
+git_*
